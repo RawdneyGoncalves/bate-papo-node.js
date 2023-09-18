@@ -1,0 +1,31 @@
+{
+  "name": "bate-papo-node",
+  "version": "1.0.0",
+  "description": "development chat utilizing socket.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RawdneyGoncalves/bate-papo-node.js.git"
+  },
+  "keywords": [
+    "node.js",
+    "development",
+    "socket.io"
+  ],
+  "author": "Rawdney and Lucas Mangolin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RawdneyGoncalves/bate-papo-node.js/issues"
+  },
+  "homepage": "https://github.com/RawdneyGoncalves/bate-papo-node.js#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "http": "^0.0.1-security",
+    "mongoose": "^7.5.2",
+    "socket.io": "^4.7.2"
+  }
+}
