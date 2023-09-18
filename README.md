@@ -1,2 +1,2 @@
 # bate-papo-node.js
-development witch node.js, development chat utilizing socket.io y express, database mongose
+development with node.js, development chat utilizing socket.io y express, database mongose
