@@ -1,2 +1,3 @@
 # bate-papo-node.js
-development with node.js, development chat utilizing socket.io y express, database mongose
+Implementação de um sistema de chat em tempo real com Node.js, fazendo uso das bibliotecas Express, Mongoose e Socket.io
+Real-time chat implementation with Node.js using Express, Mongoose, and Socket.io.
