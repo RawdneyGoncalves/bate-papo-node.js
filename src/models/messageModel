@@ -1,3 +1,9 @@
+/*
+com base na documentação, você irá tentar fazer a modelagem e criar o controller seguindo a arquitetura prevista.
+
+
+
+
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
@@ -18,3 +24,4 @@ const messageSchema = new mongoose.Schema({
 const Message = mongoose.model('Message', messageSchema);
 
 module.exports = Message;
+*/

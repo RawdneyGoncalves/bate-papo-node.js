@@ -2,29 +2,21 @@ const express = require('express');
 const routes = express.Router();
 
 
+/* 
+
+siga os exemplos abaixo na hora de criar os demais controllers
+
+
+*/ 
+
 const userController = require('../controllers/userController');
-const Message  = require('./models/messageModel'); // Importe o modelo de mensagem
+//const Message  = require('./models/messageModel'); // Importe o modelo de mensagem
 
 
-app.post('/sendMessage', async (req, res) => {
-    try {
-        const { mensagem, username } = req.body
+routes.post('/register', userController.createUser);
 
-        // nova mensagem
-        const novaMensagem = new Message({
-            mensagem,
-            username,
-            dataEnvio: new Date(),
-        })
+routes.put('/users/:id', userController.updateUser)
 
-        await novaMensagem.save()
 
-        res.status(201).json({ message: 'A mensagem foi enviada com sucesso.' });
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erro ao enviar mensagem!' });
-      }
-
-    }
-)
+module.exports = routes;

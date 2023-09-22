@@ -1,33 +1,83 @@
+
+/* desafio: 
+
+você vai ter que criptografar a senha que irá ser enserida no banco de dados, usar o bcrypt
+assim que criptografar, você irá salvar os dados no banco de dados
+
+verificar se você irá fazer mais validações(evitar fraude, ou macaquice na aplicação)
+
+fazer os demais controllers de usuario: como update, delete, e busca por id
+
+*/
+
+
+
 const express = require("express");
 
 const router = express.Router();
 
-const User = require('./models/user');
+const User = require('../models/userModel');
+var parse_email = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$/i;
 
 
 exports.createUser = async (req, res) => {
     try {
-        const { username } = req.body //tenta criar uma conta com o username
 
-        const validarUser = await User.findOne({ username }); // assincrona para verificar se o usuário existe baseado no 'username'
+       const {username, password} = req.body
+       if(!username || !password){
+        return res.status(403).send({
+            message: "Alguns atributos não foram passados, verifique e tente novamente!"
+        });
+       }
 
-        if (usuarioExistente) {
-            return res.status(400).json({ message: 'Já possui um usuário com esse nome cadastrado' })
-        }
-        // apos as validações, agora vai criar um usuario
+       //verificação de usuário
 
-        const novoUser = new User({ username })
+       if(username.length > 17){
+        return res.status(403).send({
+            message: "Usuário muito grande, tente outro menor"
+        });
+       }
 
-        await novoUser.save()
+       if(username.length < 6){
+        return res.status(403).send({
+            message: "Usuário muito pequeno, tente um maior"
+        });
+       }
 
-        // resposta é enviada com sucesso
-        res.status(201).json({ message: 'O Usuário foi criado com sucesso.' });
+
+       // puxa se o usuario existe
+       const isExistUsername = await User.findOne({username})
+
+       if(isExistUsername){
+        return res.status(403).send({message: "Esse username já criado, por favor tente outro. "});
+       }
+
+       // Verificação de senhas
+
+       if(password.length < 6){
+        return res.status(403).send({
+            message: "Senha muito pequena, tente outra maior"
+        });
+       }
+
+       if(password.length > 17){
+        return res.status(403).send({
+            message: "Senha muito grande, tente uma menor"
+        });
+       }
+
+
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Erro ao criar o usuário.' });
+        res.status(500).json({ message: `${error}` });
       }
     }
 
+
+
+exports.updateUser = async(req,res) => {
+
+    }
     
 
