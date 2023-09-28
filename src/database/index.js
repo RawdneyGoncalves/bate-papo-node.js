@@ -6,16 +6,29 @@ dica de ouro: o link de conexão irá vim assim: `mongodb+srv://${username}:${pa
 
 */
 
-const usernameDatabase = process.env.DB_NAME
-const passawordDatabase = process.env.DB_PASS
+const mongoose = require('mongoose');
+require('dotenv').config(); // Carrega o .env
 
-try {
+async function main() {
+    try {
+        mongoose.set("strictQuery", true);
 
-    
-} catch (error) {
-    console.log("este aqui foi o erro", error)
+        // Use as variáveis de ambiente para obter o nome de usuário e senha do banco de dados
+        const usernameDatabase = process.env.DB_NAME;
+        const passwordDatabase = process.env.DB_PASS;
+
+        // URL
+        const dbLink = `mongodb+srv://${usernameDatabase}:${passwordDatabase}@cluster0.irdz1ng.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp`;
+
+        await mongoose.connect(dbLink);
+
+        console.log("Conectado ao banco!");
+    } catch (error) {
+        console.log(`Erro ${error}`);
+    }
 }
 
+module.exports = main;
 
 
-module.exports = connect;
+//module.exports = connect;
