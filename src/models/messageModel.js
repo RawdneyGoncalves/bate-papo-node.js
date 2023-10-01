@@ -1,13 +1,11 @@
 /*
-com base na documentação, você irá tentar fazer a modelagem e criar o controller seguindo a arquitetura prevista.
-
-
-
+regra de modelagem de dados, aonde enviará a messagem, a data da mensagem e o usuário.
+*/
 
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
-    mensagem: {
+    message: {
         type: String,
         required: true,
     },
@@ -24,4 +22,3 @@ const messageSchema = new mongoose.Schema({
 const Message = mongoose.model('Message', messageSchema);
 
 module.exports = Message;
-*/

@@ -1,0 +1,9 @@
+PORT = 3000
+
+/* 
+
+colocar as credenciais do banco que usou, certifique que está conectando perfeitamente.
+
+
+
+*/ 
