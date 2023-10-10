@@ -1,4 +1,3 @@
-
 const express = require('express');
 const { io } = require('../../index'); 
 const router = express.Router();
