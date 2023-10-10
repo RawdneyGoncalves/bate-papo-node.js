@@ -1,12 +1,15 @@
 const express = require('express');
-const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const http = require('http');
+const socketIO = require('socket.io');
 const PORT = process.env.PORT || 3030;
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
 
 require('./src/database/index');
 
-const routes = require("./src/router/router.js");
+const routes = require('./src/router/router.js');
 
 app.use(express.json());
 
@@ -26,10 +29,10 @@ io.on('connection', (socket) => {
 
 app.use(routes);
 
-http.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
 
 module.exports = {
     io,
-  };
+};
