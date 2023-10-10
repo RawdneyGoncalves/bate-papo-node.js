@@ -2,34 +2,154 @@
 <html>
 <head>
     <title>Chat em Tempo Real</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #user-registration, #chat {
+            width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        input[type="text"], input[type="password"], button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 10px 0;
+        }
+
+        #api-responses {
+            color: #007BFF;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <h1>Chat em Tempo Real</h1>
-    
-    <div id="chat">
+
+    <div id="user-registration">
+        <input id="username" placeholder="Nome de Usuário" autocomplete="off" />
+        <input id="password" type="password" placeholder="Senha" autocomplete="off" />
+        <button id="register">Registrar</button>
+    </div>
+
+    <div id="chat" style="display: none;">
         <ul id="messages"></ul>
         <input id="message" autocomplete="off" /><button id="send">Enviar</button>
     </div>
 
+    <div id="api-responses"></div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io(); 
+        const socket = io();
 
+        const userRegistration = document.getElementById('user-registration');
+        const chat = document.getElementById('chat');
+        const apiResponses = document.getElementById('api-responses');
+
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const registerButton = document.getElementById('register');
         const messages = document.getElementById('messages');
         const messageInput = document.getElementById('message');
         const sendButton = document.getElementById('send');
 
-        sendButton.addEventListener('click', () => {
-            const message = messageInput.value;
-            messageInput.value = '';
-            socket.emit('chat message', message); 
-        });
+        function loadMessages() {
+            fetch('/messages')
+                .then(response => response.json())
+                .then(messages => {
+                    messages.forEach(message => {
+                        appendMessage(message);
+                    });
+                });
+        }
 
-        socket.on('message', (data) => {
+        function appendMessage(data) {
             const messageElement = document.createElement('li');
             messageElement.textContent = data.name + ': ' + data.message;
             messages.appendChild(messageElement);
+        }
+
+        registerButton.addEventListener('click', () => {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            if (username && password) {
+                userRegistration.style.display = 'none';
+                chat.style.display = 'block';
+
+                fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        apiResponses.innerHTML = `Registro de usuário bem-sucedido. ID do usuário: ${data.userId}`;
+                    })
+                    .catch(error => {
+                        apiResponses.innerHTML = `Erro ao registrar usuário: ${error}`;
+                    });
+            }
         });
+
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            messageInput.value = '';
+
+            fetch('/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message, user: usernameInput.value }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    apiResponses.innerHTML = `Mensagem enviada com sucesso. ID da mensagem: ${data.messageId}`;
+                })
+                .catch(error => {
+                    apiResponses.innerHTML = `Erro ao enviar mensagem: ${error}`;
+                });
+        });
+
+        socket.on('message', (data) => {
+            appendMessage(data);
+        });
+
+        loadMessages();
     </script>
 </body>
 </html>
