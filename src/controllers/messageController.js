@@ -1,14 +1,10 @@
-/* aqui usaremos o controller para  fazer que nosso bate-papo funcione. usaremos basicamente o que estamos vendo na documentação
-aqui também colocaremos o socket.io para rodar.
-*/
 
 const express = require('express');
-const io = require('socket.io')(http);
+const { io } = require('../../index'); 
 const router = express.Router();
 const mongoose = require('mongoose');
 const Message = require('../models/messageModel');
 const userController = require('../controllers/userController');
-const { io } = require('../../index');
 
 exports.getMessage = async (req, res) => {
     const user = userController.getUser();
