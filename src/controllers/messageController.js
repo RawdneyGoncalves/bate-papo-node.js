@@ -3,20 +3,39 @@ aqui também colocaremos o socket.io para rodar.
 */
 
 const express = require('express');
-
+const io = require('socket.io')(http);
 const router = express.Router();
-
-const mongoose = require('mongoose'); 
-
-const messageModel = require('../models/messageModel');
+const mongoose = require('mongoose');
+const Message = require('../models/messageModel');
+const userController = require('../controllers/userController');
+const { io } = require('../../index');
 
 exports.getMessage = async (req, res) => {
-    //fazer a regra de negocio de captar mensagem basicamente como está na documentação
+    const user = userController.getUser();
+    Message.find({ name: user }, (err, messages) => {
+        res.send(messages);
+    });
 }
 
-
-
 exports.postMessage = async (req, res) => {
+    try {
+        const user = userController.getUser();
 
-    //fazer a regra de negocio de enviar mensagem
+        const message = new Message({ ...req.body, name: user });
+        const savedMessage = await message.save();
+        console.log('Message saved');
+
+        const censored = await Message.findOne({ message: 'badword' });
+        if (censored) {
+            await Message.remove({ _id: censored.id });
+        } else {
+            io.emit('message', { ...req.body, name: user }); 
+            res.sendStatus(200);
+        }
+    } catch (error) {
+        res.sendStatus(500);
+        return console.log('Error:', error);
+    } finally {
+        console.log('Message Posted');
+    }
 }
