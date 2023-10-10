@@ -27,7 +27,6 @@ exports.getUser = async (req, res) => { //feito
     try {
         const id = req.params.id;
 
-        // Verifica se o valor de `id` é um ObjectId válido
         if (!mongoose.Types.ObjectId.isValid(id)) {
             res.status(400).json({ msg: "O valor de `id` deve ser um ObjectId válido" });
             return;
@@ -41,24 +40,20 @@ exports.getUser = async (req, res) => { //feito
             return;
         }
 
-        res.json(user);
+       res.json(user);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Ocorreu um erro ao buscar o usuário" });
     }
 };
 
-exports.getAllUser = async (req, res) => { //feito
-    try {
-      // Use o modelo User para buscar todos os usuários
-      const users = await User.find({});
-  
-      // Retorna os usuários
-      res.json(users);
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "Ocorreu um erro ao buscar os usuários" });
-    }
+exports.getAllUser = async (req, res) => { try {
+    const users = await User.find({});
+    res.json(users);
+} catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Ocorreu um erro ao buscar os usuários" });
+}
   };
 
 
@@ -67,13 +62,11 @@ exports.deleteUser = async (req, res) => {
     try {
         const id = req.params.id;
 
-        // Verifica se o valor de `id` é um ObjectId válido
         if (!mongoose.Types.ObjectId.isValid(id)) {
             res.status(400).json({ msg: "O valor de `id` deve ser um ObjectId válido" });
             return;
         }
 
-        // Use o modelo User para buscar o usuário pelo ID
         const user = await User.findByIdAndDelete(id);
 
         if (!user) {
@@ -81,7 +74,7 @@ exports.deleteUser = async (req, res) => {
             return;
         }
 
-        res.status(200).json({msg: "Usuário deletado com sucesso"});
+        res.status(200).json({ msg: "Usuário deletado com sucesso" });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Ocorreu um erro ao buscar o usuário" });
@@ -96,130 +89,110 @@ exports.deleteUser = async (req, res) => {
 
 exports.createUser = async (req, res) => { //feito 
     try {
+        const { username, password } = req.body;
 
-        const { username, password } = req.body
         if (!username || !password) {
             return res.status(403).send({
                 message: "Alguns atributos não foram passados, verifique e tente novamente!"
             });
         }
 
-        //verificação de usuário
-
-        if (username.length > 17) {
+        if (username.length > 17 || username.length < 6) {
             return res.status(403).send({
-                message: "Usuário muito grande, tente outro menor"
+                message: "Usuário deve ter entre 6 e 17 caracteres"
             });
         }
 
-        if (username.length < 6) {
-            return res.status(403).send({
-                message: "Usuário muito pequeno, tente um maior"
-            });
-        }
-
-
-        // puxa se o usuario existe
-        const isExistUsername = await User.findOne({ username })
+        const isExistUsername = await User.findOne({ username });
 
         if (isExistUsername) {
-            return res.status(403).send({ message: "Esse username já criado, por favor tente outro. " });
+            return res.status(403).send({ message: "Esse username já foi criado, por favor, tente outro." });
         }
 
-        // Verificação de senhas
-
-        if (password.length < 6) {
+        if (password.length < 6 || password.length > 17) {
             return res.status(403).send({
-                message: "Senha muito pequena, tente outra maior"
+                message: "Senha deve ter entre 6 e 17 caracteres"
             });
         }
 
-        if (password.length > 17) {
-            return res.status(403).send({
-                message: "Senha muito grande, tente uma menor"
+        const saltRounds = 10;
+        bcrypt.hash(password, saltRounds, async (err, hash) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: "Erro ao criar usuário" });
+            }
+
+            const novoUsuario = new User({
+                username,
+                password: hash
             });
-        }
 
-        const novoUsuario = new User({
-            username,
-            password
-        })
+            await novoUsuario.save();
 
-        await novoUsuario.save()
-
-        return res.status(200).send({
-            message: "O usuário foi criado com sucesso"
-        })
+            return res.status(200).send({
+                message: "O usuário foi criado com sucesso"
+            });
+        });
 
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: `${error}` });
     }
-}
+};
 
 
 
 exports.updateUser = async (req, res) => { // feito
     try {
-
-        const { username, password } = req.body
+        const { username, password } = req.body;
         if (!username || !password) {
             return res.status(403).send({
                 message: "Alguns atributos não foram passados, verifique e tente novamente!"
             });
         }
 
-        //verificação de usuário
-
-        if (username.length > 17) {
+        if (username.length > 17 || username.length < 6) {
             return res.status(403).send({
-                message: "Usuário muito grande, tente outro menor"
+                message: "Usuário deve ter entre 6 e 17 caracteres"
             });
         }
 
-        if (username.length < 6) {
+        const isExistUsername = await User.findOne({ username });
+
+        if (isExistUsername) {
+            return res.status(403).send({ message: "Esse username já foi criado, por favor, tente outro." });
+        }
+
+        if (password.length < 6 || password.length > 17) {
             return res.status(403).send({
-                message: "Usuário muito pequeno, tente um maior"
+                message: "Senha deve ter entre 6 e 17 caracteres"
             });
         }
 
-
-        // puxa se o usuario existe
-        const isExistUsername = await User.findOne({ username })
-
-
-        // Verificação de senhas
-
-        if (password.length < 6) {
-            return res.status(403).send({
-                message: "Senha muito pequena, tente outra maior"
-            });
-        }
-
-        if (password.length > 17) {
-            return res.status(403).send({
-                message: "Senha muito grande, tente uma menor"
-            });
-        }
-
-        const id = req.params.id
+        const id = req.params.id;
 
         const dadosUser = {
             username: req.body.username,
             password: req.body.password
         }
 
-        const updatedService = await User.findByIdAndUpdate(id, dadosUser)
-        
-        if(!updatedService){
-            res.status(404).json({msg: "Usuário não encontrado"});
-            return;
-        }
-    
-        res.status(200).json({msg: "Usuário atualizado com sucesso"})
+        bcrypt.hash(dadosUser.password, saltRounds, async (err, hash) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: "Erro ao atualizar usuário" });
+            }
 
+            dadosUser.password = hash;
 
+            const updatedService = await User.findByIdAndUpdate(id, dadosUser);
 
+            if (!updatedService) {
+                res.status(404).json({ msg: "Usuário não encontrado" });
+                return;
+            }
+
+            res.status(200).json({ msg: "Usuário atualizado com sucesso" });
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: `${error}` });
