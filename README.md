@@ -54,6 +54,8 @@ Contribuições são bem-vindas! Sinta-se à vontade para melhorar este projeto 
 
 ## Autor
 
-- [Rawdney](https://github.com/seu-usuario) - Coloque aqui uma breve descrição sobre você.
+
+
+- [Rawdney]([https://github.com/seu-usuario](https://github.com/RawdneyGoncalves)) - developer back-end.
 
 ---
