@@ -1,36 +1,39 @@
 const express = require('express');
-const { io } = require('../../index'); 
+const { io } = require('../../index');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Message = require('../models/messageModel');
 const userController = require('../controllers/userController');
+const User = require('../models/userModel');
 
-exports.getMessage = async (req, res) => {
-    const user = userController.getUser();
-    Message.find({ name: user }, (err, messages) => {
-        res.send(messages);
-    });
-}
+
+
 
 exports.postMessage = async (req, res) => {
     try {
-        const user = userController.getUser();
+        const { id, message } = req.body;
 
-        const message = new Message({ ...req.body, name: user });
-        const savedMessage = await message.save();
-        console.log('Message saved');
-
-        const censored = await Message.findOne({ message: 'badword' });
-        if (censored) {
-            await Message.remove({ _id: censored.id });
-        } else {
-            io.emit('message', { ...req.body, name: user }); 
-            res.sendStatus(200);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ msg: 'O valor do `id` deve ser um ObjectId válido' });
         }
+
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({ msg: 'Usuário não encontrado' });
+        }
+
+        const newMessage = new Message({ message, name: user._id });
+
+        const savedMessage = await newMessage.save();
+
+        console.log(savedMessage);
+        console.log('Mensagem salva');
+        res.sendStatus(200);
     } catch (error) {
-        res.sendStatus(500);
-        return console.log('Error:', error);
+        console.error('Erro:', error);
+        res.status(500).json({ message: 'Ocorreu um erro ao postar a mensagem' });
     } finally {
-        console.log('Message Posted');
+        console.log('Mensagem postada');
     }
-}
+};
