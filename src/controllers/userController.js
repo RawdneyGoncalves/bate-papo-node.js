@@ -25,7 +25,7 @@ exports.getUser = async (req, res) => {
         res.json(user);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Ocorreu um erro ao buscar o usuário' });
+        res.status(404).json({ message: 'Ocorreu um erro ao buscar o usuário' });
     }
 };
 
@@ -100,7 +100,7 @@ exports.createUser = async (req, res) => {
                 username,
                 password: hash
             });
-
+            console.log(newUser)
             await newUser.save();
 
             return res.status(200).send({
