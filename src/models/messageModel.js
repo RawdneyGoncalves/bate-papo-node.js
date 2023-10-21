@@ -1,7 +1,3 @@
-/*
-regra de modelagem de dados, aonde enviará a messagem, a data da mensagem e o usuário.
-*/
-
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
@@ -12,6 +8,10 @@ const messageSchema = new mongoose.Schema({
     dataEnvio: {
         type: Date,
         default: Date.now,
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
     },
 });
 
