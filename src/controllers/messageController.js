@@ -3,11 +3,7 @@ const { io } = require('../../index');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Message = require('../models/messageModel');
-const userController = require('../controllers/userController');
 const User = require('../models/userModel');
-
-
-
 
 exports.postMessage = async (req, res) => {
     try {
@@ -23,7 +19,7 @@ exports.postMessage = async (req, res) => {
             return res.status(404).json({ msg: 'Usuário não encontrado' });
         }
 
-        const newMessage = new Message({ message, name: user._id });
+        const newMessage = new Message({ message, user: user._id }); 
 
         const savedMessage = await newMessage.save();
 
